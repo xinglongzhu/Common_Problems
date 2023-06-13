@@ -1,0 +1,2 @@
+build:
+  cmake: multi-core
