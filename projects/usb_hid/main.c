@@ -12,9 +12,7 @@ NRF_LOG_MODULE_REGISTER();
  */
 static void idle_state_handle(void)
 {
-    if (NRF_LOG_PROCESS() == false) {
-
-    }
+    if (NRF_LOG_PROCESS() == false) {}
 }
 
 /**
@@ -28,9 +26,7 @@ static void log_init(void)
 
 int main(void)
 {
-   log_init();
-   NRF_LOG_INFO("main start\n");
-   for (;;) {
-      idle_state_handle();
-   }   
+    log_init();
+    NRF_LOG_INFO("main start\n");
+    for (;;) { idle_state_handle(); }
 }
