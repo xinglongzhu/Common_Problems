@@ -171,6 +171,13 @@ uint32_t app_fifo_read(app_fifo_t * p_fifo, uint8_t * p_byte_array, uint32_t * p
  */
 uint32_t app_fifo_write(app_fifo_t * p_fifo, uint8_t const * p_byte_array, uint32_t * p_size);
 
+/**@brief Function for getting the count that the fifo has used how many space.
+ *
+ * @param[in]  p_fifo   Pointer to the FIFO.
+ *
+ * @retval     the count that the fifo has used how many space.
+ */
+uint32_t app_fifo_usage_get(app_fifo_t *p_fifo);
 
 #ifdef __cplusplus
 }

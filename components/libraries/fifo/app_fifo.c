@@ -211,4 +211,10 @@ uint32_t app_fifo_write(app_fifo_t * p_fifo, uint8_t const * p_byte_array, uint3
 
     return NRF_SUCCESS;
 }
+
+uint32_t app_fifo_usage_get(app_fifo_t *p_fifo)
+{
+    return fifo_length(p_fifo);
+}
+
 #endif //NRF_MODULE_ENABLED(APP_FIFO)

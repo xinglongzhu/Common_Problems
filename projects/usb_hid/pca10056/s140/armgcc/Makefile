@@ -70,6 +70,12 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_wdt.c \
+  $(PROJ_DIR)/user/user_drivers/mt_mod_btn.c \
+  $(PROJ_DIR)/user/user_drivers/mt_serial.c \
+  $(PROJ_DIR)/user/user_apps/mt_logic.c \
+  $(PROJ_DIR)/user/user_apps/mt_ble_cfg.c \
+  $(PROJ_DIR)/user/user_apps/mt_ble_adv.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -205,6 +211,8 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/nfc/ndef/conn_hand_parser/ac_rec_parser \
   $(SDK_ROOT)/components/libraries/stack_guard \
   $(SDK_ROOT)/components/libraries/log/src \
+  $(PROJ_DIR)/user/user_apps \
+  $(PROJ_DIR)/user/user_drivers \
 
 # Libraries common to all targets
 LIB_FILES += \
