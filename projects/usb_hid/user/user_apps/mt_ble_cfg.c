@@ -14,10 +14,21 @@
 #include "mt_ble_cfg.h"
 #include "mt_ble_service.h"
 #include "mt_ble_adv.h"
+#include "peer_manager.h"
+#include "peer_manager_handler.h"
 
 #define NRF_LOG_MODULE_NAME ble_cfg
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
+
+#define SEC_PARAM_BOND            1
+#define SEC_PARAM_MITM            0
+#define SEC_PARAM_LESC            0
+#define SEC_PARAM_KEYPRESS        0
+#define SEC_PARAM_IO_CAPABILITIES BLE_GAP_IO_CAPS_NONE
+#define SEC_PARAM_OOB             0
+#define SEC_PARAM_MIN_KEY_SIZE    7
+#define SEC_PARAM_MAX_KEY_SIZE    16
 
 static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< 连接句柄. */
 NRF_BLE_GATT_DEF(m_gatt);
@@ -44,6 +55,28 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
             m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
             NRF_LOG_INFO("Connected.");
             break;
+
+        case BLE_GAP_EVT_SEC_PARAMS_REQUEST:
+            NRF_LOG_INFO("BLE_GAP_EVT_SEC_PARAMS_REQUEST");
+            break;
+
+        case BLE_GAP_EVT_AUTH_KEY_REQUEST:
+            NRF_LOG_INFO("BLE_GAP_EVT_AUTH_KEY_REQUEST");
+            break;
+
+        case BLE_GAP_EVT_LESC_DHKEY_REQUEST:
+            NRF_LOG_INFO("BLE_GAP_EVT_LESC_DHKEY_REQUEST");
+            break;
+
+        case BLE_GAP_EVT_AUTH_STATUS:
+            NRF_LOG_INFO("BLE_GAP_EVT_AUTH_STATUS: status=0x%x bond=0x%x lv4: %d kdist_own:0x%x "
+                         "kdist_peer:0x%x",
+                         p_ble_evt->evt.gap_evt.params.auth_status.auth_status,
+                         p_ble_evt->evt.gap_evt.params.auth_status.bonded,
+                         p_ble_evt->evt.gap_evt.params.auth_status.sm1_levels.lv4,
+                         *((uint8_t *)&p_ble_evt->evt.gap_evt.params.auth_status.kdist_own),
+                         *((uint8_t *)&p_ble_evt->evt.gap_evt.params.auth_status.kdist_peer));
+            break;            
 
         case BLE_GATTS_EVT_SYS_ATTR_MISSING:
             APP_ERROR_CHECK(sd_ble_gatts_sys_attr_set(m_conn_handle, NULL, 0, 0));
@@ -190,6 +223,53 @@ static void ble_stack_init()
     APP_ERROR_CHECK(sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE));
 }
 
+/**
+ * @brief peer manager 事件处理函数.
+ * 
+ * @param[in] p_evt 事件
+ */
+static void pm_evt_handler(pm_evt_t const *p_evt)
+{
+    if (p_evt->evt_id == PM_EVT_CONN_SEC_CONFIG_REQ) {
+        pm_conn_sec_config_t conn_sec_config = { .allow_repairing = true };
+        pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+    } else if (p_evt->evt_id == PM_EVT_CONN_SEC_SUCCEEDED) {
+        NRF_LOG_INFO("PM_EVT_CONN_SEC_SUCCEEDED");
+    } else if (p_evt->evt_id == PM_EVT_CONN_SEC_START) {
+        NRF_LOG_INFO("PM_EVT_CONN_SEC_START");
+    }
+    pm_handler_on_pm_evt(p_evt);
+    pm_handler_flash_clean(p_evt);
+}
+
+/**
+ * @brief peer_manager 初始化
+ */
+static void peer_manager_init(void)
+{
+    ble_gap_sec_params_t sec_param;
+
+    APP_ERROR_CHECK(pm_init());
+
+    memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
+
+    sec_param.bond           = SEC_PARAM_BOND;
+    sec_param.mitm           = SEC_PARAM_MITM;
+    sec_param.lesc           = SEC_PARAM_LESC;
+    sec_param.keypress       = SEC_PARAM_KEYPRESS;
+    sec_param.io_caps        = SEC_PARAM_IO_CAPABILITIES;
+    sec_param.oob            = SEC_PARAM_OOB;
+    sec_param.min_key_size   = SEC_PARAM_MIN_KEY_SIZE;
+    sec_param.max_key_size   = SEC_PARAM_MAX_KEY_SIZE;
+    sec_param.kdist_own.enc  = 1;
+    sec_param.kdist_own.id   = 1;
+    sec_param.kdist_peer.enc = 1;
+    sec_param.kdist_peer.id  = 1;
+
+    APP_ERROR_CHECK(pm_sec_params_set(&sec_param));
+    APP_ERROR_CHECK(pm_register(pm_evt_handler));
+}
+
 uint16_t mt_get_conn_handle(void)
 {
     return m_conn_handle;
@@ -198,6 +278,7 @@ uint16_t mt_get_conn_handle(void)
 void mt_ble_config_init(void)
 {
     ble_stack_init();
+    peer_manager_init();
     gap_params_init();
     conn_params_init();
     gatt_init();
