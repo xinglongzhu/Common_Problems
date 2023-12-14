@@ -12,6 +12,8 @@
 #include "app_timer.h"
 #include "app_util_platform.h"
 #include "mt_ble_cfg.h"
+#include "mt_ble_service.h"
+#include "mt_ble_adv.h"
 
 #define NRF_LOG_MODULE_NAME ble_cfg
 #include "nrf_log.h"
@@ -34,6 +36,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
 
         case BLE_GAP_EVT_DISCONNECTED:
             m_conn_handle = BLE_CONN_HANDLE_INVALID;
+            ble_adv_start();
             NRF_LOG_INFO("Disconnected.");
             break;
 
@@ -187,10 +190,16 @@ static void ble_stack_init()
     APP_ERROR_CHECK(sd_power_dcdc_mode_set(NRF_POWER_DCDC_ENABLE));
 }
 
+uint16_t mt_get_conn_handle(void)
+{
+    return m_conn_handle;
+}
+
 void mt_ble_config_init(void)
 {
     ble_stack_init();
     gap_params_init();
     conn_params_init();
     gatt_init();
+    ble_service_init();
 }

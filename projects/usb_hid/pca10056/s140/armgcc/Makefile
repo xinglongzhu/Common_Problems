@@ -41,6 +41,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/sortlist/nrf_sortlist.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(SDK_ROOT)/components/libraries/uart/retarget.c \
+  $(SDK_ROOT)/components/ble/ble_services/ble_hids/ble_hids.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
   $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
@@ -76,6 +77,7 @@ SRC_FILES += \
   $(PROJ_DIR)/user/user_apps/mt_logic.c \
   $(PROJ_DIR)/user/user_apps/mt_ble_cfg.c \
   $(PROJ_DIR)/user/user_apps/mt_ble_adv.c \
+  $(PROJ_DIR)/user/user_apps/mt_ble_service.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
