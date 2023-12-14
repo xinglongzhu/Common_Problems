@@ -47,7 +47,7 @@ typedef enum {
  */
 typedef struct {
     serial_evt_id_t evt_id;
-    void *          p_data;
+    uint8_t *       p_data;
     uint32_t        len;
 } serial_evt_t;
 

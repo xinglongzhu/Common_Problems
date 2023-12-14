@@ -14,6 +14,7 @@
 #include "mt_module_pin.h"
 #include "mt_serial.h"
 #include "mt_ble_adv.h"
+#include "mt_ble_service.h"
 
 #define NRF_LOG_MODULE_NAME logic
 #include "nrf_log.h"
@@ -52,6 +53,7 @@ static void serial_evt_handler(serial_evt_t *p_evt)
     switch (p_evt->evt_id) {
         case SERIAL_EVT_RX_OVER:
             NRF_LOG_HEXDUMP_INFO(p_evt->p_data, p_evt->len);
+            hid_send_report(p_evt->p_data[0],(uint8_t*)(&p_evt->p_data[1]),p_evt->len - 1);
             break;
 
         case SERIAL_EVT_TX_COMPLETE:
